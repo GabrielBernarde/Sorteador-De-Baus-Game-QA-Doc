@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação de QA - Sorteador de Baús Game</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Relatório de Qualidade do Projeto "Sorteador de Baús Game"</h1>
+            <p class="project-link-header">Visite o projeto principal: <a href="https://gabrielbernarde.github.io/Sorteador-De-Baus-Game/" target="_blank" rel="noopener noreferrer">Sorteador de Baús Game</a></p>
+        </div>
+    </header>
+
+    <main>
+        <section id="introducao" class="section">
+            <div class="section-content">
+                <h2>Introdução</h2>
+                <p>
+                    Este documento serve como um relatório abrangente de Qualidade (QA) para o projeto "Sorteador de Baús Game". Ele detalha a jornada de validação do sistema, desde os testes manuais iniciais focados na usabilidade, passando pelas melhorias implementadas, até a robusta automação de testes funcionais end-to-end com Cypress. Nosso objetivo é garantir a qualidade, aprimorar a experiência do usuário e assegurar a estabilidade do jogo.
+                </p>
+                <p>Você pode acessar o projeto principal aqui: <a href="https://gabrielbernarde.github.io/Sorteador-De-Baus-Game/" target="_blank" rel="noopener noreferrer">https://gabrielbernarde.github.io/Sorteador-De-Baus-Game/</a></p>
+            </div>
+        </section>
+
+        <section id="primeira-versao" class="section">
+            <div class="section-content">
+                <h2>1. Contexto Inicial e Primeira Versão (Problemas de Usabilidade)</h2>
+                <p>Essa era a primeira versão que criei, onde identifiquei diversas inconsistências significativas quanto à usabilidade. O fluxo inicial exigia que o usuário inserisse um nome e um ID aleatório. Após isso, um `Alert` seria acionado, exibindo um novo ID gerado pelo sistema e solicitando confirmação para o cadastro.</p>
+                <p>A experiência do usuário era prejudicada pois, ao cancelar ou inserir um ID incorreto no `Alert`, o sistema pedia uma nova tentativa. Muitos usuários ignoravam a mensagem do `Alert`, resultando em dificuldades para se conectar ao sistema. Essa fricção na interação foi o ponto de partida para as melhorias de UX.</p>
+
+                <h3>1.1. Capturas de Tela da Primeira Versão</h3>
+                <div class="image-gallery">
+                    <div class="image-item">
+                        <img src="PrimeiraV1.png" alt="Primeira Versão - Tela de Cadastro Inicial">
+                        <p class="image-caption">Tela inicial da primeira versão com campos Nome e ID (primeiro input do usuário).</p>
+                    </div>
+                    <div class="image-item">
+                        <img src="PrimeiraV2.png" alt="Primeira Versão - Alert de Confirmação de ID">
+                        <p class="image-caption">O Alert exibindo o ID gerado e solicitando a confirmação do ID para efetuar o cadastramento.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="segunda-versao" class="section">
+            <div class="section-content">
+                <h2>2. Segunda Versão e Melhorias de Usabilidade</h2>
+                <p>Com base nos testes manuais e no feedback de usabilidade, o sistema foi atualizado para uma segunda versão. O foco foi tornar o processo de cadastro e login mais intuitivo e claro, eliminando os pontos de atrito identificados.</p>
+
+                <h3>2.1. Melhorias Implementadas</h3>
+                <ul>
+                    <li><strong>Geração de ID Automatizada e Clara:</strong> O campo de ID agora é preenchido automaticamente quando o usuário clica em "Gerar ID". O sistema reconhece se o usuário é novo ou existente através do nome. Para novos usuários, o campo ID inicialmente indica que o ID será gerado e permanece somente leitura até a geração.</li>
+                    <li><strong>Confirmação em 2 Etapas Mantida:</strong> Um sistema de confirmação em duas etapas foi mantido, mas com melhor clareza, para garantir que o usuário anote seu ID antes de prosseguir.</li>
+                </ul>
+
+                <h3>2.2. Capturas de Tela da Segunda Versão (Fluxo Melhorado)</h3>
+                <div class="image-gallery">
+                    <div class="image-item">
+                        <img src="SegundaV1.png" alt="Segunda Versão - Campo ID somente leitura">
+                        <p class="image-caption">Tela de cadastro da segunda versão, com o campo ID inicialmente como 'Seu ID será gerado aqui' e o botão 'Gerar ID' visível para novos usuários.</p>
+                    </div>
+                    <div class="image-item">
+                        <img src="SegundaV2.png" alt="Segunda Versão - ID gerado e botão 'Entrar / Cadastrar' habilitado">
+                        <p class="image-caption">Após gerar o ID, o campo é preenchido com o ID único e o botão 'Entrar / Cadastrar' é habilitado, juntamente com uma mensagem de anotação do ID.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="bug-identificado" class="section">
+            <div class="section-content">
+                <h2>3. Descoberta de Bug via Testes Manuais (Confirmação de ID)</h2>
+                <p>Através de testes manuais dedicados, identifiquei um bug crítico no fluxo de confirmação do ID para novos usuários, que comprometia a integridade do cadastro.</p>
+
+                <h3>3.1. Cenário do Bug (Passos para Reproduzir)</h3>
+                <ol>
+                    <li>Um novo usuário preenche o nome (ex: "Gabriel") e clica no botão "Gerar ID". Um ID é gerado (ex: 99394).</li>
+                    <li>O sistema exibe o prompt de confirmação do ID (a segunda etapa de verificação).</li>
+                    <li>O usuário **cancela o prompt** ou **digita um ID incorreto**.</li>
+                    <li>O sistema exibe a mensagem "Os IDs não coincidem. Por favor, verifique seu ID.".</li>
+                    <li>**Comportamento Inesperado (Bug):** Após essa mensagem, o campo de ID que deveria permanecer `readonly` (já que o ID foi gerado pelo sistema), torna-se **editável**, permitindo que o usuário digite **qualquer ID aleatório**.</li>
+                    <li>O sistema, então, aceita esse ID digitado manualmente, solicitando uma nova confirmação para um ID que não foi gerado pelo próprio sistema.</li>
+                </ol>
+                <p>Esse comportamento não era esperado, pois o sistema foi projetado para gerar IDs automaticamente e o usuário deveria apenas confirmar o ID gerado para prosseguir.</p>
+
+                <h3>3.2. Capturas de Tela do Bug</h3>
+                <div class="image-gallery">
+                    <div class="image-item">
+                        <img src="bug1.png" alt="Bug - Mensagem de erro de ID não coincidente">
+                        <p class="image-caption">1. Mensagem de erro exibida quando o ID digitado na confirmação não coincide com o ID gerado ou quando a confirmação é cancelada.</p>
+                    </div>
+                    <div class="image-item">
+                        <img src="bug2.png" alt="Bug - Campo ID torna-se editável após erro">
+                        <p class="image-caption">2. Após a mensagem de erro, o campo de ID que deveria ser somente leitura, torna-se editável, permitindo a inserção manual de um ID.</p>
+                    </div>
+                    <div class="image-item">
+                        <img src="bug3.png" alt="Bug - Sistema pede nova confirmação para ID manual">
+                        <p class="image-caption">3. O sistema aceita o ID manual e solicita uma nova confirmação para um ID que não foi gerado automaticamente.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="solucao-e-proximos-passos" class="section">
+            <div class="section-content">
+                <h2>4. Solução e Próximos Passos (Testes Manuais)</h2>
+                <p>O bug identificado foi crucial para aprimorar a lógica de cadastro. A solução implementada garante que, se um novo usuário cancelar ou errar a confirmação do ID, o sistema reverterá o estado do formulário para a condição de "não cadastrado". Isso inclui limpar o ID gerado, tornar o campo ID novamente somente leitura e forçar o usuário a usar o botão "Gerar ID" novamente, mantendo a integridade do processo de cadastro.</p>
+                <p>Este processo de testes manuais foi fundamental para identificar e corrigir falhas críticas, garantindo a robustez e a usabilidade do "Sorteador de Baús Game". A experiência de testar e validar o comportamento do sistema me permitiu entregar um produto mais coeso e alinhado às expectativas do usuário.</p>
+            </div>
+        </section>
+
+        <section id="codigo-automacao" class="section">
+            <div class="section-content">
+                <h2>5. Código da Automação de Testes Cypress</h2>
+                <p>Abaixo, o código completo da suíte de testes automatizados End-to-End (E2E) desenvolvida com Cypress, que valida os principais fluxos do jogo, incluindo cadastro, login, interação com os baús e histórico de partidas.</p>
+                <div class="code-block-container">
+                    <pre><code class="language-javascript">describe('Jogo dos Baús - Teste Automatizado Completo', () => {
+  const username = 'TesteCypress';
+  let generatedId = '';
+
+  beforeEach(() => {
+    cy.visit('https://gabrielbernarde.github.io/Sorteador-De-Baus-Game/');
+    cy.wait(1500);
+  });
+
+  const playOneGame = () => {
+    for (let i = 1; i <= 9; i++) {
+      cy.get(`[data-bau-id="${i}"] button`).click();
+      cy.wait(900);
+    }
+
+    cy.get('#loading-results-screen').should('have.class', 'active');
+    cy.wait(2000);
+    cy.get('#results-screen h2').should('contain', username.toUpperCase());
+    cy.get('#play-again-btn').should('be.visible');
+  };
+
+  it('Realiza cadastro, joga 2 partidas, verifica histórico e troca usuário', () => {
+    cy.get('#username').type(username);
+    cy.get('#generate-id-btn').click();
+
+    cy.get('#id').invoke('val').then((id) => {
+      generatedId = id;
+
+      cy.window().then((win) => {
+        cy.stub(win, 'prompt').returns(generatedId);
+        cy.stub(win, 'alert').callsFake((msg) => {
+          Cypress.log({ name: 'Alert interceptado', message: msg });
+        });
+      });
+
+      cy.get('#register-btn').should('not.be.disabled').click();
+
+      playOneGame();
+
+      cy.get('#play-again-btn').click();
+      cy.wait(1000);
+      cy.get('#game-screen').should('be.visible');
+      playOneGame();
+
+      cy.get('#show-my-games-btn').click();
+      cy.get('#my-games-modal').should('have.class', 'active');
+      cy.get('#historical-games-modal-container .game-card', { timeout: 10000 }).should('have.length', 2);
+      cy.get('#my-games-modal .modal-close-btn').click();
+      cy.get('#my-games-modal').should('have.class', 'hidden');
+
+      cy.get('#change-user-btn').click();
+      cy.wait(1000);
+      cy.get('#register-screen').should('be.visible');
+      cy.get('#username').should('have.value', '');
+      cy.get('#id').should('have.value', '');
+
+      cy.log('✔️ Teste completo finalizado com sucesso!');
+    });
+  });
+});
+                    </code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="testes-automatizados" class="section">
+            <div class="section-content">
+                <h2>6. Demonstração dos Testes Automatizados</h2>
+                <p>Para complementar os testes manuais e garantir a regressão de funcionalidades críticas, implementei uma suíte de testes automatizados End-to-End (E2E) utilizando Cypress. Essa automação foca nos principais fluxos do jogo, como o processo de cadastro/login e a interação com os baús, assegurando que as funcionalidades permaneçam íntegras a cada nova alteração no código.</p>
+                <p>A automação proporciona uma verificação rápida e repetível das funcionalidades essenciais, reduzindo o tempo necessário para feedback e aumentando a confiança nas entregas do projeto.</p>
+
+                <h3>6.1. Execução dos Testes Automatizados</h3>
+                <div class="video-container">
+                    <video controls autoplay muted loop>
+                        <source src="Teste-CypressE2E.mp4" type="video/mp4">
+                        Seu navegador não suporta o elemento de vídeo.
+                    </video>
+                </div>
+                <p class="video-caption">O vídeo acima demonstra a execução automatizada dos testes E2E com Cypress, cobrindo o fluxo de login/cadastro e a interação com os baús do jogo.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Gabriel Bernarde. Todos os direitos reservados.</p>
+        <p class="project-link-footer">Projeto principal: <a href="https://gabrielbernarde.github.io/Sorteador-De-Baus-Game/" target="_blank" rel="noopener noreferrer">Sorteador de Baús Game</a></p>
+    </footer>
+
+    <div id="imageModal" class="modal">
+        <span class="close-button">&times;</span>
+        <img class="modal-content" id="img01">
+        <div id="caption"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
